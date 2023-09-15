@@ -8,7 +8,7 @@ sources:
     schema: jaffle_shop
 
     tables:
-      - name: EXTERNAL_CUSTOMER
+      - name: EXTERNAL_CUSTOMER_WITH_PARTITION
         
         columns:
           - name: customer_id
@@ -16,7 +16,7 @@ sources:
             tests:
               - unique
               - warn_if_null_with_insert
-      - name: EXTERNAL_ORDER
+      - name: EXTERNAL_ORDER_PARTION
         
         columns:
           - name: order_id

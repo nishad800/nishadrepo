@@ -1,44 +1,49 @@
-with customers as (
+{% test warn_if_null_with_insert(model,column_name) %}
 
-    select * from {{ ref('stg_customer_ext') }}
+ 
 
-),
+    {{ config(severity = 'warn') }}
 
-orders as (
+ 
 
-    select * from {{ ref('stg_order_ext') }}
-
-),
-
-customer_orders as (
+{% set null_check_query %}
 
     select
-        customer_id,
 
-        min(order_date) as first_order_date,
-        max(order_date) as most_recent_order_date,
-        count(order_id) as number_of_orders
+        '{{ target.database }}' ,
 
-    from orders
+        '{{ target.schema }}',
 
-    group by 1
+        '{{ model }}',
 
-),
+        '90',
 
-final as (
+        'IS_NULL_TEST',
 
-    select
-        customers.customer_id,
-        customers.first_name,
-        customers.last_name,
-        customer_orders.first_order_date,
-        customer_orders.most_recent_order_date,
-        coalesce(customer_orders.number_of_orders, 0) as number_of_orders
+        'Null in key column -> {{ column_name }} in {{ model }}',
 
-    from customers
+        current_timestamp(),
 
-    left join customer_orders using (customer_id)
+        'BSNS_ENTTY_CODE_ABC',
 
-)
+         METADATA$FILENAME ,
 
-select * from final
+        value,
+
+        current_timestamp()
+
+        from {{model}}
+
+        where ({{column_name}}  is NULL)
+{% endset %}
+
+{{ null_check_query }}
+
+{% if execute %}
+
+    --{{ insert_reject_records(null_check_query) }}
+    {% set result_val = insert_reject_records(null_check_query) %}      
+
+{% endif %}
+
+{% endtest %}

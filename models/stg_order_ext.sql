@@ -9,4 +9,4 @@ select
     status,
     ETL_LOADED_AT
 
-from {{ source('jaffle_shop', 'EXTERNAL_ORDER') }}
+from {{ source('jaffle_shop', 'EXTERNAL_ORDER_PARTION') }}
